@@ -48,7 +48,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.DNSimple.Client" Version="3.0.123" />
+        <PackageReference Include="Soenneker.DNSimple.Client" Version="3.0.125" />
         <PackageReference Include="Soenneker.Extensions.HttpClient" Version="3.0.3264" />
     </ItemGroup>
 </Project>
