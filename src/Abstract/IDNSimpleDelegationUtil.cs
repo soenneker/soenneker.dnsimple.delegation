@@ -1,32 +1,27 @@
-﻿using Soenneker.DNSimple.Delegation.Requests;
-using Soenneker.DNSimple.Delegation.Responses;
+﻿using Soenneker.DNSimple.OpenApiClient.Models;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Soenneker.DNSimple.Delegation.Abstract;
-
-/// <summary>
-/// A .NET typesafe implementation of DNSimple's Delegation API
-/// </summary>
 public interface IDNSimpleDelegationUtil
 {
     /// <summary>
     /// Lists all name servers for a domain.
     /// </summary>
-    ValueTask<NameServerListResponse?> ListNameServers(string domain, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<List<string>?> ListNameServers(string domain, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Changes the name servers for a domain.
     /// </summary>
-    ValueTask<NameServerListResponse?> ChangeNameServers(string domain, NameServerUpdateRequest request, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<List<string>?> ChangeNameServers(string domain, List<string> nameServers, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Delegates a domain to vanity name servers.
     /// </summary>
-    ValueTask<VanityNameServerResponse?> DelegateToVanityNameServers(string domain, NameServerUpdateRequest request, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<List<NameServer>?> DelegateToVanityNameServers(string domain, List<string> nameServers, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes vanity name server delegation from a domain.
     /// </summary>
-    ValueTask<bool> DedelegateFromVanityNameServers(string domain, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<bool> DedelegateFromVanityNameServers(string domain, CancellationToken cancellationToken = default);
 }

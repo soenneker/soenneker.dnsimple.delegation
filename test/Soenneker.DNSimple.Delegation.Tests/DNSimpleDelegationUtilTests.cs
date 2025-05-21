@@ -1,5 +1,4 @@
-﻿using Soenneker.DNSimple.Delegation.Abstract;
-using Soenneker.Tests.FixturedUnit;
+﻿using Soenneker.Tests.FixturedUnit;
 using Xunit;
 
 namespace Soenneker.DNSimple.Delegation.Tests;

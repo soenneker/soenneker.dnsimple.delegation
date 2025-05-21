@@ -1,69 +1,56 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Soenneker.DNSimple.Client.Abstract;
-using Soenneker.DNSimple.Delegation.Abstract;
-using Soenneker.DNSimple.Delegation.Requests;
-using Soenneker.DNSimple.Delegation.Responses;
-using System.Net.Http;
+using Soenneker.DNSimple.OpenApiClient;
+using Soenneker.DNSimple.OpenApiClient.Models;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Delegation;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Delegation.Vanity;
+using Soenneker.DNSimple.OpenApiClientUtil.Abstract;
 using Soenneker.Extensions.Configuration;
-using Soenneker.Extensions.HttpClient;
-using Soenneker.Extensions.ValueTask;
 
-namespace Soenneker.DNSimple.Delegation;
-
-/// <inheritdoc cref="IDNSimpleDelegationUtil"/>
-public class DNSimpleDelegationUtil: IDNSimpleDelegationUtil
+public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
 {
-    private readonly IDNSimpleClientUtil _clientUtil;
-    private readonly ILogger<DNSimpleDelegationUtil> _logger;
-    private readonly string _accountId;
+    private readonly IDNSimpleOpenApiClientUtil _clientUtil;
+    private readonly int _accountId;
 
-    public DNSimpleDelegationUtil(IDNSimpleClientUtil clientUtil, IConfiguration configuration, ILogger<DNSimpleDelegationUtil> logger)
+    public DNSimpleDelegationUtil(IDNSimpleOpenApiClientUtil clientUtil, IConfiguration configuration, ILogger<DNSimpleDelegationUtil> logger)
     {
         _clientUtil = clientUtil;
-        _logger = logger;
-        _accountId = configuration.GetValueStrict<string>("DNSimple:AccountId");
+        _accountId = configuration.GetValueStrict<int>("DNSimple:AccountId");
     }
 
-    /// <summary>
-    /// Lists all name servers for a domain.
-    /// </summary>
-    public async ValueTask<NameServerListResponse?> ListNameServers(string domain, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<List<string>?> ListNameServers(string domain, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/delegation";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<NameServerListResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        DelegationGetResponse? response = await client[_accountId].Registrar.Domains[domain].Delegation.GetAsDelegationGetResponseAsync(cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    /// <summary>
-    /// Changes the name servers for a domain.
-    /// </summary>
-    public async ValueTask<NameServerListResponse?> ChangeNameServers(string domain, NameServerUpdateRequest request, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<List<string>?> ChangeNameServers(string domain, List<string> nameServers, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/delegation";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<NameServerListResponse>(HttpMethod.Put, endpoint, request, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        DelegationPutResponse? response = await client[_accountId]
+                                                .Registrar.Domains[domain]
+                                                .Delegation.PutAsDelegationPutResponseAsync(nameServers, cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    /// <summary>
-    /// Delegates a domain to vanity name servers.
-    /// </summary>
-    public async ValueTask<VanityNameServerResponse?> DelegateToVanityNameServers(string domain, NameServerUpdateRequest request, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<List<NameServer>?> DelegateToVanityNameServers(string domain, List<string> nameServers,
+        CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/delegation/vanity";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<VanityNameServerResponse>(HttpMethod.Put, endpoint, request, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        VanityPutResponse? response = await client[_accountId]
+                                            .Registrar.Domains[domain]
+                                            .Delegation.Vanity.PutAsVanityPutResponseAsync(nameServers, cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    /// <summary>
-    /// Removes vanity name server delegation from a domain.
-    /// </summary>
-    public async ValueTask<bool> DedelegateFromVanityNameServers(string domain, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> DedelegateFromVanityNameServers(string domain, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/delegation/vanity";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return (await client.SendToType<VanityNameServerResponse>(HttpMethod.Delete, endpoint, null, _logger, cancellationToken)) != null;
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        await client[_accountId].Registrar.Domains[domain].Delegation.Vanity.DeleteAsync(cancellationToken: cancellationToken);
+        return true;
     }
 }

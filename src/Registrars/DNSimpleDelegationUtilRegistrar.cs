@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Soenneker.DNSimple.Client.Registrars;
-using Soenneker.DNSimple.Delegation.Abstract;
+using Soenneker.DNSimple.OpenApiClientUtil.Registrars;
 
 namespace Soenneker.DNSimple.Delegation.Registrars;
 
@@ -15,8 +14,7 @@ public static class DNSimpleDelegationUtilRegistrar
     /// </summary>
     public static IServiceCollection AddDNSimpleDelegationUtilAsSingleton(this IServiceCollection services)
     {
-        services.AddDNSimpleClientUtilAsSingleton();
-        services.TryAddSingleton<IDNSimpleDelegationUtil, DNSimpleDelegationUtil>();
+        services.AddDNSimpleOpenApiClientUtilAsSingleton().TryAddSingleton<IDNSimpleDelegationUtil, DNSimpleDelegationUtil>();
 
         return services;
     }
@@ -26,8 +24,7 @@ public static class DNSimpleDelegationUtilRegistrar
     /// </summary>
     public static IServiceCollection AddDNSimpleDelegationUtilAsScoped(this IServiceCollection services)
     {
-        services.AddDNSimpleClientUtilAsScoped();
-        services.TryAddScoped<IDNSimpleDelegationUtil, DNSimpleDelegationUtil>();
+        services.AddDNSimpleOpenApiClientUtilAsSingleton().TryAddScoped<IDNSimpleDelegationUtil, DNSimpleDelegationUtil>();
 
         return services;
     }
