@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Soenneker.Extensions.ValueTask;
 
+///<inheritdoc cref="IDNSimpleDelegationUtil"/>
 public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
 {
     private readonly IDNSimpleOpenApiClientUtil _clientUtil;
@@ -26,7 +27,7 @@ public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
     public async ValueTask<List<string>?> ListNameServers(string domain, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        DelegationGetResponse? response = await client[_accountId].Registrar.Domains[domain].Delegation.GetAsDelegationGetResponseAsync(cancellationToken: cancellationToken).NoSync();
+        DelegationGetResponse? response = await client[_accountId].Registrar.Domains[domain].Delegation.GetAsync(cancellationToken: cancellationToken).NoSync();
         return response?.Data;
     }
 
@@ -35,7 +36,8 @@ public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
         DelegationPutResponse? response = await client[_accountId]
                                                 .Registrar.Domains[domain]
-                                                .Delegation.PutAsDelegationPutResponseAsync(nameServers, cancellationToken: cancellationToken).NoSync();
+                                                .Delegation.PutAsync(nameServers, cancellationToken: cancellationToken)
+                                                .NoSync();
         return response?.Data;
     }
 
@@ -45,7 +47,8 @@ public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
         VanityPutResponse? response = await client[_accountId]
                                             .Registrar.Domains[domain]
-                                            .Delegation.Vanity.PutAsVanityPutResponseAsync(nameServers, cancellationToken: cancellationToken).NoSync();
+                                            .Delegation.Vanity.PutAsync(nameServers, cancellationToken: cancellationToken)
+                                            .NoSync();
         return response?.Data;
     }
 
