@@ -27,17 +27,17 @@ public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
     public async ValueTask<List<string>?> ListNameServers(string domain, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        DelegationGetResponse? response = await client[_accountId].Registrar.Domains[domain].Delegation.GetAsync(cancellationToken: cancellationToken).NoSync();
+        GetDomainDelegation200? response = await client[_accountId].Registrar.Domains[domain].Delegation.GetAsync(cancellationToken: cancellationToken).NoSync();
         return response?.Data;
     }
 
     public async ValueTask<List<string>?> ChangeNameServers(string domain, List<string> nameServers, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        DelegationPutResponse? response = await client[_accountId]
-                                                .Registrar.Domains[domain]
-                                                .Delegation.PutAsync(nameServers, cancellationToken: cancellationToken)
-                                                .NoSync();
+        ChangeDomainDelegation200? response = await client[_accountId]
+                                                   .Registrar.Domains[domain]
+                                                   .Delegation.PutAsync(nameServers, cancellationToken: cancellationToken)
+                                                   .NoSync();
         return response?.Data;
     }
 
