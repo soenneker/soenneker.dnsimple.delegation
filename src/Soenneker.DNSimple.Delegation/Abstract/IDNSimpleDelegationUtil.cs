@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Defines the dn simple delegation util contract.
+/// </summary>
 public interface IDNSimpleDelegationUtil
 {
     /// <summary>
