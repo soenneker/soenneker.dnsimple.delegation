@@ -21,7 +21,7 @@ public sealed class DNSimpleDelegationUtil : IDNSimpleDelegationUtil
     public DNSimpleDelegationUtil(IDNSimpleOpenApiClientUtil clientUtil, IConfiguration configuration, ILogger<DNSimpleDelegationUtil> logger)
     {
         _clientUtil = clientUtil;
-        _accountId = configuration.GetValueStrict<int>("DNSimple:AccountId");
+        _accountId = (int)new System.ComponentModel.Int32Converter().ConvertFromInvariantString(configuration.GetStringStrict("DNSimple:AccountId"))!;
     }
 
     public async ValueTask<List<string>?> ListNameServers(string domain, CancellationToken cancellationToken = default)
